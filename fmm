@@ -23,5 +23,7 @@ typeset -a ENABLED_MOD_LIST
 typeset -a DISABLED_MOD_LIST
 
 update_mod_list() {
-    # read ~/.factorio/mods/mod-list.json and get a list of enabled and disabled mods
+    CURRENT_MOD_LIST = $(jq '.[][][]' ~/.factorio/mods/mod-list.json)
+    ENABLED_MOD_LIST = $(jq '.[][] | select(.enabled == true) | .name' mod-list.json)
+    DISABLED_MOD_LIST = $(jq '.[][] | select(.enabled == false) | .name' mod-list.json)
 }
