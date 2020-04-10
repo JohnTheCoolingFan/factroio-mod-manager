@@ -45,6 +45,6 @@ list_mods() {
 
 if [[ ${actions[(ie)'-h']} -le ${#actions} ]] || [[ ${actions[(ie)'--help']} -le ${#actions} ]] then
     usage
-elif [[ ${#actions[(ie)'-l']} -le ${#actions} ]] || [[ ${actions[(ie)'--list']} -le ${#actions }]] then
+elif [[ ${#actions[(ie)'-l']} -le ${#actions} ]] || [[ ${actions[(ie)'--list']} -le ${#actions } ]] then
     list_mods
 fi
