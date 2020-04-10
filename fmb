@@ -1,0 +1,95 @@
+#! /sbin/env zsh
+
+usage() {
+    echo 'Factorio Mod Builder'
+    echo ''
+    echo "Usage: $0 [options] [FILE|DIR]"
+    echo ''
+    echo 'Options:'
+    echo '  -h --help            Show this screen.'
+    echo '  -p                   Pack current folder into proper .zip mod archive.'
+    echo '     --pack (DIR)      Pack contents of DIR into proper .zip mod archive'
+    echo '  -i --install (FILE)  Install FILE (.zip mod archive) to ~/.factorio/mods/'
+    echo '  -b                   Pack current mod folder into .zip file and install it [default].'
+}
+
+zparseopts -D -E -- i+:=install_list -install+:=install_list -pack::=pack_list b+=actions p+=actions h+=actions -help+=actions
+
+install_list=("${(@)install_list:#-i}")
+install_list=("${(@)install_list:#--install}")
+
+new_pack_list=()
+
+for pack_item in $pack_list; do
+    new_pack_list+=${pack_item#"--pack"}
+done
+
+pack_list=$new_pack_list
+unset new_pack_list
+
+detect_mod_info() {
+    if [[ -f 'info.json' ]] then
+        MODNAME="$(jq -r ".name" info.json)"
+        MODVERSION="$(jq -r ".version" info.json)"
+        MODFILE_NAME="$MODNAME"_"$MODVERSION"
+        MOD_INFO_SUCCESS=true
+    else
+        MOD_INFO_SUCCESS=false
+    fi
+}
+
+pack() {
+    detect_mod_info
+    if [[ $MOD_INFO_SUCCESS ]] then
+        echo "Packing $MODFILE_NAME"
+        echo "  Moving all files from current dir to $MODFILE_NAME/"
+        rsync -a * $MODFILE_NAME
+        echo "  Compressing $MODFILE_NAME/ into $MODFILE_NAME.zip"
+        7z a -sdel "$MODFILE_NAME.zip" $MODFILE_NAME > /dev/null
+    else
+        echo "info.json not found in $(pwd)"
+    fi
+}
+
+install_mod() {
+    echo "Installing $1"
+    rsync $1 ~/.factorio/mods/
+}
+
+cleanup() {
+    echo "Deleting $1.zip from ${pwd}"
+    rm $1.zip
+}
+
+pack_and_install() {
+    pack
+    install_mod $MODFILE_NAME.zip
+    cleanup $MODFILE_NAME
+}
+
+echo $pack_list
+
+if [[ ${actions[(ie)'-h']} -le ${#actions} ]] || [[ ${actions[(ie)'--help']} -le ${#actions} ]] then
+    usage
+else
+    if [[ ${#install_list[@]} -ne 0 ]] then
+        for install_item in $install_list; do
+            if [[ -f install_item ]] then
+                install_mod install_item
+            else
+                echo "$install_item not found"
+            fi
+        done
+    elif [[ ${#pack_list[@]} -ne 0 ]] then
+        for pack_item in pack_list; do
+            local old_path=$(pwd)
+            cd "$pack_item"
+            pack
+            cd "$old_path"
+        done
+    elif [[ ${actions[(ie)'-p']} -le ${#actions} ]] then
+        pack
+    elif [[ ${actions[(ie)'-b']} -le ${#actions} ]] then
+        pack_and_install
+    fi
+fi

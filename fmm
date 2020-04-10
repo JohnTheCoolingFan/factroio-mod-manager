@@ -1,0 +1,27 @@
+#! /sbin/env zsh
+
+# Planned: Somehow read the mod title
+
+usage() {
+    echo 'Factorio Mod Manager'
+    echo ''
+    echo "Uage: $0 [options] [MODID]"
+    echo ''
+    echo 'Options:'
+    echo '  -h --help                Show this screen'
+    echo '  -l --list                List currently enabled and disabled mods'
+    echo '     --list-enabled        List only enabled mods'
+    echo '     --list-disabled       List only disabled mods'
+    echo '  -e --enable (MODID)      Enable mod with specified MODID'
+    echo '  -d --disable (MODID)     Disable mod with specified MODID'
+    echo '     --save (PRESET_NAME)  Save list of currently enabled and disabled mods'
+    echo '     --load (PRESET_NAME)  Load saved list of enabled mods'
+}
+
+CURRENT_MOD_LIST=()
+ENABLED_MOD_LIST=()
+DISABLED_MOD_LIST=()
+
+update_mod_list() {
+    # read ~/.factorio/mods/mod-list.json and get a list of enabled and disabled mods
+}
