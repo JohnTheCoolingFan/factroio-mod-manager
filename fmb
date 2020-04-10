@@ -71,25 +71,25 @@ echo $pack_list
 
 if [[ ${actions[(ie)'-h']} -le ${#actions} ]] || [[ ${actions[(ie)'--help']} -le ${#actions} ]] then
     usage
-else
-    if [[ ${#install_list[@]} -ne 0 ]] then
-        for install_item in $install_list; do
-            if [[ -f install_item ]] then
-                install_mod install_item
-            else
-                echo "$install_item not found"
-            fi
-        done
-    elif [[ ${#pack_list[@]} -ne 0 ]] then
-        for pack_item in pack_list; do
-            local old_path=$(pwd)
-            cd "$pack_item"
-            pack
-            cd "$old_path"
-        done
-    elif [[ ${actions[(ie)'-p']} -le ${#actions} ]] then
+elif [[ ${#install_list[@]} -ne 0 ]] then
+    for install_item in $install_list; do
+        if [[ -f install_item ]] then
+            install_mod install_item
+        else
+            echo "$install_item not found"
+        fi
+    done
+elif [[ ${#pack_list[@]} -ne 0 ]] then
+    for pack_item in pack_list; do
+        local old_path=$(pwd)
+        cd "$pack_item"
         pack
-    elif [[ ${actions[(ie)'-b']} -le ${#actions} ]] then
-        pack_and_install
-    fi
+        cd "$old_path"
+    done
+elif [[ ${actions[(ie)'-p']} -le ${#actions} ]] then
+    pack
+elif [[ ${actions[(ie)'-b']} -le ${#actions} ]] then
+    pack_and_install
+else
+    usage
 fi
