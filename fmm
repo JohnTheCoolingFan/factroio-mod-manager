@@ -18,9 +18,9 @@ usage() {
     echo '     --load (PRESET_NAME)  Load saved list of enabled mods'
 }
 
-CURRENT_MOD_LIST=()
-ENABLED_MOD_LIST=()
-DISABLED_MOD_LIST=()
+typeset -A CURRENT_MOD_LIST
+typeset -a ENABLED_MOD_LIST
+typeset -a DISABLED_MOD_LIST
 
 update_mod_list() {
     # read ~/.factorio/mods/mod-list.json and get a list of enabled and disabled mods
