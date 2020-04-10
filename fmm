@@ -18,6 +18,14 @@ usage() {
     echo '     --load (PRESET_NAME)  Load saved list of enabled mods'
 }
 
+zparseopts -D -E -- h+=actions -help+=actions\
+    l+=actions -list+=actions\
+    -list-enabled+=actions -list-disabled+=actions\
+    e+:=enable_list -enable+:=enable_list\
+    d+:=disable_list -disable+:=disable_list\
+    -save:=save_preset_name\
+    -load:=load_preset_name
+
 typeset -A CURRENT_MOD_LIST
 typeset -a ENABLED_MOD_LIST
 typeset -a DISABLED_MOD_LIST
