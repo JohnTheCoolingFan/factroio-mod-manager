@@ -35,3 +35,16 @@ update_mod_list() {
     ENABLED_MOD_LIST = $(jq '.[][] | select(.enabled == true) | .name' mod-list.json)
     DISABLED_MOD_LIST = $(jq '.[][] | select(.enabled == false) | .name' mod-list.json)
 }
+
+list_mods() {
+    update_mod_list
+    for MODID in "${!CURRENT_MOD_LIST[@]}"; do
+        echo "$(7z e -so $MODID_)" # TODO
+    done
+}
+
+if [[ ${actions[(ie)'-h']} -le ${#actions} ]] || [[ ${actions[(ie)'--help']} -le ${#actions} ]] then
+    usage
+elif [[ ${#actions[(ie)'-l']} -le ${#actions} ]] || [[ ${actions[(ie)'--list']} -le ${#actions }]] then
+    list_mods
+fi
