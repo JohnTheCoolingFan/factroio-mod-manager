@@ -44,8 +44,8 @@ get_mod_info() {
     elif [[ -d ~/.factorio/mods/"$1" ]] then
         MOD_INFO_JSON = $(cat ~/.factorio/mods/$1/info.json)
     fi
-    MOD_TITLE = echo $MOD_INFO_JSON | jq -r '.title'
-    MOD_VERSION = echo $MOD_INFO_JSON | jq -r '.version'
+    MOD_TITLE = jq -r '.title' <<< $MOD_INFO_JSON
+    MOD_VERSION = jq -r '.version' <<< $MOD_INFO_JSON
     MOD_IS_ENABLED = $CURRENT_MOD_LIST[$1]
 }
 
