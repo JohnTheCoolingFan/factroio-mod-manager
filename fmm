@@ -1,12 +1,10 @@
-#! /sbin/env zsh
+#!zsh
 
-# Planned: Somehow read the mod title
+setopt extendedglob
 
 usage() {
     echo 'Factorio Mod Manager'
-    echo ''
-    echo "Uage: $0 [options] [MODID]"
-    echo ''
+    echo 'Usage: $0 \[options\] \[MODID\]'
     echo 'Options:'
     echo '  -h --help                Show this screen'
     echo '  -l --list                List currently enabled and disabled mods'
@@ -30,8 +28,6 @@ typeset -A CURRENT_MOD_LIST
 typeset -a ENABLED_MOD_LIST
 typeset -a DISABLED_MOD_LIST
 
-setopt extendedglob
-
 update_mod_list() {
     CURRENT_MOD_LIST = $(jq '.[][][]' ~/.factorio/mods/mod-list.json)
     ENABLED_MOD_LIST = $(jq '.[][] | select(.enabled == true) | .name' mod-list.json)
@@ -44,16 +40,16 @@ get_mod_info() {
     elif [[ -d ~/.factorio/mods/"$1" ]] then
         MOD_INFO_JSON = $(cat ~/.factorio/mods/$1/info.json)
     fi
-    MOD_TITLE = jq -r '.title' <<< $MOD_INFO_JSON
-    MOD_VERSION = jq -r '.version' <<< $MOD_INFO_JSON
+    MOD_TITLE = $(jq -r '.title' <<< $MOD_INFO_JSON)
+    MOD_VERSION = $(jq -r '.version' <<< $MOD_INFO_JSON)
     MOD_IS_ENABLED = $CURRENT_MOD_LIST[$1]
 }
 
 list_mods() {
     update_mod_list
-    for MODID in "${!CURRENT_MOD_LIST[@]}"; do
+    for MODID in '${!CURRENT_MOD_LIST[@]}'; do
         get_mod_info
-        echo "$mod_title $mod_version \[$MODID\] \($(if [[ $mod_is_enabled ]]; then echo 'enabled'; else echo 'disabled')\)"
+        echo "$MOD_TITLE $MOD_VERSION \[$MODID\]"
     done
 }
 
