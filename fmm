@@ -30,16 +30,30 @@ typeset -A CURRENT_MOD_LIST
 typeset -a ENABLED_MOD_LIST
 typeset -a DISABLED_MOD_LIST
 
+setopt extendedglob
+
 update_mod_list() {
     CURRENT_MOD_LIST = $(jq '.[][][]' ~/.factorio/mods/mod-list.json)
     ENABLED_MOD_LIST = $(jq '.[][] | select(.enabled == true) | .name' mod-list.json)
     DISABLED_MOD_LIST = $(jq '.[][] | select(.enabled == false) | .name' mod-list.json)
 }
 
+get_mod_info() {
+    if [[ -f ~/.factorio/mods/"$1"_[[:digit:]]##.[[:digit:]]##.[[:digit:]]##.zip ]] then
+        MOD_INFO_JSON = $(7z e -so ~/.factorio/mods/"$1"_[[:digit:]]##.[[:digit:]]##.[[:digit:]]##.zip info.json -r)
+    elif [[ -d ~/.factorio/mods/"$1" ]] then
+        MOD_INFO_JSON = $(cat ~/.factorio/mods/$1/info.json)
+    fi
+    MOD_TITLE = echo $MOD_INFO_JSON | jq -r '.title'
+    MOD_VERSION = echo $MOD_INFO_JSON | jq -r '.version'
+    MOD_IS_ENABLED = $CURRENT_MOD_LIST[$1]
+}
+
 list_mods() {
     update_mod_list
     for MODID in "${!CURRENT_MOD_LIST[@]}"; do
-        echo "$(7z e -so $MODID_)" # TODO
+        get_mod_info
+        echo "$mod_title $mod_version \[$MODID\] \($(if [[ $mod_is_enabled ]]; then echo 'enabled'; else echo 'disabled')\)"
     done
 }
 
