@@ -52,14 +52,16 @@ get_mod_info() {
     fi
 }
 
+print_mod_list() {
+    for MODID MODSTATE in ${(kv)1}; do
+        get_mod_info $MODID
+        echo "$MOD_TITLE $MOD_VERSION [$MODID] ($MOD_STATE)"
+    done
+}
+
 list_mods() {
     update_mod_list
-    for MODID MODSTATE in ${(kv)CURRENT_MOD_LIST}; do
-        echo 'debug'
-        echo "$MODID $MODSTATE"
-        get_mod_info $MODID
-        echo "$MOD_TITLE $MOD_VERSION \[$MODID\] \($MOD_STATE\)"
-    done
+    print_mod_list $CURRENT_MOD_LIST
 }
 
 if [[ ${actions[(ie)'-h']} -le ${#actions} ]] || [[ ${actions[(ie)'--help']} -le ${#actions} ]] then
