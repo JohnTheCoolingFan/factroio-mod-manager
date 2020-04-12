@@ -43,13 +43,18 @@ get_mod_info() {
     MOD_TITLE = $(jq -r '.title' <<< $MOD_INFO_JSON)
     MOD_VERSION = $(jq -r '.version' <<< $MOD_INFO_JSON)
     MOD_IS_ENABLED = $CURRENT_MOD_LIST[$1]
+    if [[ $MOD_IS_ENABLED ]] then
+        MOD_STATE = 'enabled'
+    else
+        MOD_STATE = 'disabled'
+    fi
 }
 
 list_mods() {
     update_mod_list
     for MODID in '${!CURRENT_MOD_LIST[@]}'; do
         get_mod_info
-        echo "$MOD_TITLE $MOD_VERSION \[$MODID\]"
+        echo "$MOD_TITLE $MOD_VERSION \[$MODID\] \($MOD_STATE\)"
     done
 }
 
